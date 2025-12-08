@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025 게임 빙고 (PS5 & Xbox)</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="background-orb orb-1"></div>
+    <div class="background-orb orb-2"></div>
+
+    <header>
+        <h1>2025 <span class="highlight">GAME</span> BINGO</h1>
+    </header>
+
+    <main class="container">
+        <section class="bingo-section">
+            <div class="controls">
+                <button id="generate-btn" class="btn-primary">
+                    <span class="icon">🎲</span> 랜덤 생성 (Random)
+                </button>
+                <div class="mode-toggles">
+                    <button id="mode-random" class="btn-mode active">랜덤 모드</button>
+                    <button id="mode-manual" class="btn-mode">수동 모드</button>
+                </div>
+            </div>
+
+            <div class="bingo-board" id="bingo-board">
+                <!-- Grid items will be generated here -->
+                <div class="empty-state">
+                    <p>버튼을 눌러 빙고를 시작하세요!</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="game-list-section">
+            <div class="list-header">
+                <h2>전체 게임 리스트</h2>
+                <button id="add-game-btn" class="btn-icon" title="게임 추가">+</button>
+            </div>
+            <div class="game-list" id="game-list">
+                <!-- Game list items will be generated here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Add/Edit Game Modal -->
+    <div id="game-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="modal-title">게임 추가</h2>
+            <form id="game-form">
+                <input type="hidden" id="game-id">
+                <div class="form-group">
+                    <label>게임 제목 (한글)</label>
+                    <input type="text" id="title-kr" required placeholder="예: 젤다의 전설">
+                </div>
+                <div class="form-group">
+                    <label>Game Title (English)</label>
+                    <input type="text" id="title-en" requierd placeholder="e.g. Legend of Zelda">
+                </div>
+                <div class="form-group">
+                    <label>출시일</label>
+                    <input type="text" id="release-date" placeholder="예: Dec 25, 2025">
+                </div>
+                <div class="form-group">
+                    <label>플랫폼</label>
+                    <select id="platform">
+                        <option value="Both">Both (PS5 & Xbox)</option>
+                        <option value="PS5">PS5 Only</option>
+                        <option value="Xbox">Xbox Only</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary full-width">저장 (Save)</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>Created with AI Agent • 2025 Gaming Anticipation</p>
+    </footer>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
