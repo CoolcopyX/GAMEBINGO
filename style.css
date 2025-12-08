@@ -80,18 +80,50 @@ h1 {
     letter-spacing: -2px;
     margin-bottom: 0.5rem;
     text-shadow: 0 0 20px rgba(138, 43, 226, 0.5);
+    line-height: 1.1;
 }
 
 .highlight {
     background: linear-gradient(45deg, var(--accent-secondary), var(--accent-primary));
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
 .subtitle {
-    font-size: 1.2rem;
-    color: rgba(255, 255, 255, 0.7);
-    font-weight: 300;
+    font-size: 1.5rem;
+    color: var(--accent-secondary);
+    font-weight: 700;
+    margin-top: 0.5rem;
+    text-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+}
+
+/* Guide Text */
+.guide-text {
+    color: #ffeb3b;
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+    animation: pulse 2s infinite;
+    text-align: center;
+}
+
+.guide-text.hidden {
+    display: none;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.7;
+    }
+
+    50% {
+        opacity: 1;
+        text-shadow: 0 0 10px #ffeb3b;
+    }
+
+    100% {
+        opacity: 0.7;
+    }
 }
 
 /* Container */
@@ -107,6 +139,25 @@ h1 {
 @media (max-width: 900px) {
     .container {
         grid-template-columns: 1fr;
+        padding: 0 1rem 4rem;
+        gap: 2rem;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+    }
+
+    .bingo-board {
+        width: 100%;
+        max-width: 500px;
+        /* Limit size on mobile */
+    }
+
+    /* Order change: Board first, List second is default in DOM */
+    /* Ensure Game List handles height properly on mobile */
+    .game-list-section {
+        max-height: 500px;
+        /* Reduced height for mobile scroll */
     }
 }
 

@@ -18,6 +18,7 @@
 
     <header>
         <h1>2025 <span class="highlight">GAME</span> BINGO</h1>
+        <p class="subtitle">- 갓겜원정대 -</p>
     </header>
 
     <main class="container">
@@ -30,6 +31,7 @@
                     <button id="mode-random" class="btn-mode active">랜덤 모드</button>
                     <button id="mode-manual" class="btn-mode">수동 모드</button>
                 </div>
+                <p id="manual-guide" class="guide-text hidden">오른쪽 리스트를 드래그해서 빈칸을 채워주세요!</p>
             </div>
 
             <div class="bingo-board" id="bingo-board">
@@ -64,20 +66,9 @@
                 </div>
                 <div class="form-group">
                     <label>Game Title (English)</label>
-                    <input type="text" id="title-en" requierd placeholder="e.g. Legend of Zelda">
+                    <input type="text" id="title-en" required placeholder="e.g. Legend of Zelda">
                 </div>
-                <div class="form-group">
-                    <label>출시일</label>
-                    <input type="text" id="release-date" placeholder="예: Dec 25, 2025">
-                </div>
-                <div class="form-group">
-                    <label>플랫폼</label>
-                    <select id="platform">
-                        <option value="Both">Both (PS5 & Xbox)</option>
-                        <option value="PS5">PS5 Only</option>
-                        <option value="Xbox">Xbox Only</option>
-                    </select>
-                </div>
+                <!-- Simplified Form: Removed Date and Platform Inputs -->
                 <button type="submit" class="btn-primary full-width">저장 (Save)</button>
             </form>
         </div>
