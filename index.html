@@ -31,7 +31,9 @@
                     <button id="mode-random" class="btn-mode active">랜덤 모드</button>
                     <button id="mode-manual" class="btn-mode">수동 모드</button>
                 </div>
-                <p id="manual-guide" class="guide-text hidden">오른쪽 리스트를 드래그해서 빈칸을 채워주세요!</p>
+                <p id="manual-guide" class="guide-text hidden">
+                    오른쪽 리스트를 드래그 또는 빈칸(<span style="font-size:1.2em">+</span>)을 눌러 게임을 선택해주세요!
+                </p>
             </div>
 
             <div class="bingo-board" id="bingo-board">
@@ -56,7 +58,7 @@
     <!-- Add/Edit Game Modal -->
     <div id="game-modal" class="modal hidden">
         <div class="modal-content">
-            <span class="close-modal">&times;</span>
+            <span class="close-modal" id="close-game-modal">&times;</span>
             <h2 id="modal-title">게임 추가</h2>
             <form id="game-form">
                 <input type="hidden" id="game-id">
@@ -66,11 +68,22 @@
                 </div>
                 <div class="form-group">
                     <label>Game Title (English)</label>
-                    <input type="text" id="title-en" required placeholder="e.g. Legend of Zelda">
+                    <input type="text" id="title-en" placeholder="e.g. Legend of Zelda">
                 </div>
                 <!-- Simplified Form: Removed Date and Platform Inputs -->
                 <button type="submit" class="btn-primary full-width">저장 (Save)</button>
             </form>
+        </div>
+    </div>
+
+    <!-- Selection Modal for Click-to-Fill -->
+    <div id="select-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal" id="close-select-modal">&times;</span>
+            <h2>게임 선택</h2>
+            <div class="selection-list" id="selection-list">
+                <!-- List will be populated dynamically -->
+            </div>
         </div>
     </div>
 

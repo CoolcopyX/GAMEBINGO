@@ -12,6 +12,9 @@ const manualGuide = document.getElementById('manual-guide');
 const addGameBtn = document.getElementById('add-game-btn');
 const gameModal = document.getElementById('game-modal');
 const closeModal = document.querySelector('.close-modal');
+// close-game-modal id was added in HTML, ensuring we select it correctly or use querySelector
+const closeGameModalBtn = document.getElementById('close-game-modal') || document.querySelector('.close-modal');
+
 const gameForm = document.getElementById('game-form');
 const modalTitle = document.getElementById('modal-title');
 
@@ -19,13 +22,18 @@ const modalTitle = document.getElementById('modal-title');
 const inputId = document.getElementById('game-id');
 const inputTitleKr = document.getElementById('title-kr');
 const inputTitleEn = document.getElementById('title-en');
-// Simplified form: Release and Platform not used in inputs anymore
+
+// Selection Modal Elements (Click-to-Fill)
+const selectModal = document.getElementById('select-modal');
+const closeSelectModalBtn = document.getElementById('close-select-modal');
+const selectionList = document.getElementById('selection-list');
 
 
 let currentBingoGames = [];
 let markedIndices = new Set();
 let isManualMode = false;
 let draggedGameId = null;
+let targetCellIndex = null; // Used for mobile click-to-fill
 
 // Dynamic Games List
 let allGames = [];
@@ -67,12 +75,16 @@ function setupEventListeners() {
 
     // CRUD Event Listeners
     addGameBtn.addEventListener('click', openAddModal);
-    closeModal.addEventListener('click', closeGameModal);
+    if (closeGameModalBtn) closeGameModalBtn.addEventListener('click', closeGameModal);
     gameForm.addEventListener('submit', handleFormSubmit);
+
+    // Select Modal Listeners
+    if (closeSelectModalBtn) closeSelectModalBtn.addEventListener('click', closeSelectModal);
 
     // Close modal on outside click
     window.addEventListener('click', (e) => {
         if (e.target === gameModal) closeGameModal();
+        if (e.target === selectModal) closeSelectModal();
     });
 }
 
@@ -81,7 +93,7 @@ function setupEventListeners() {
 function openAddModal() {
     modalTitle.innerText = "게임 추가 (Add Game)";
     gameForm.reset();
-    document.getElementById('game-id').value = '';
+    inputId.value = '';
     gameModal.classList.remove('hidden');
 }
 
@@ -92,8 +104,7 @@ function openEditModal(id) {
     modalTitle.innerText = "게임 수정 (Edit Game)";
     inputId.value = game.id;
     inputTitleKr.value = game.titleKr;
-    inputTitleEn.value = game.title;
-    // Release and Platform are preserved but not shown
+    inputTitleEn.value = game.title || ""; // Optional
 
     gameModal.classList.remove('hidden');
 }
@@ -113,7 +124,7 @@ function handleFormSubmit(e) {
     const newGame = {
         id: id,
         titleKr: inputTitleKr.value,
-        title: inputTitleEn.value,
+        title: inputTitleEn.value, // Can be empty string if optional
         // Default values for simplified form
         release: existingGame ? existingGame.release : "2025 (TBD)",
         platform: existingGame ? existingGame.platform : "Both"
@@ -232,10 +243,14 @@ function renderGameList() {
 
         const info = document.createElement('div');
         info.className = 'game-info';
-        info.innerHTML = `
-            <span class="game-title-kr">${game.titleKr}</span>
-            <span class="game-title-en">${game.title}</span>
-        `;
+
+        // Handle optional English title visibility
+        let titleHtml = `<span class="game-title-kr">${game.titleKr}</span>`;
+        if (game.title) {
+            titleHtml += `<span class="game-title-en">${game.title}</span>`;
+        }
+
+        info.innerHTML = titleHtml;
 
         item.appendChild(info);
         item.appendChild(actions);
@@ -325,6 +340,53 @@ function updateUsedGameList() {
 }
 
 
+// --- Click to Fill (Selection Modal) ---
+
+function openSelectionModal(index) {
+    targetCellIndex = index;
+    selectionList.innerHTML = '';
+
+    const usedIds = new Set(currentBingoGames.filter(g => g).map(g => g.id));
+    const sorted = [...allGames].sort((a, b) => new Date(b.release) - new Date(a.release));
+
+    sorted.forEach(game => {
+        // [User Request] Skip games already on the board
+        if (usedIds.has(game.id)) return;
+
+        const div = document.createElement('div');
+        div.className = 'selection-item';
+
+        // Display
+        let titleText = `<span class="game-title-kr">${game.titleKr}</span>`;
+        if (game.title) titleText += ` <span class="game-title-en">(${game.title})</span>`;
+
+        div.innerHTML = titleText;
+        div.addEventListener('click', () => handleSelection(game));
+
+        selectionList.appendChild(div);
+    });
+
+    selectModal.classList.remove('hidden');
+}
+
+function handleSelection(game) {
+    if (targetCellIndex === null) return;
+
+    currentBingoGames[targetCellIndex] = game;
+    // Render specific cell
+    const cell = document.querySelector(`.bingo-cell[data-index="${targetCellIndex}"]`);
+    if (cell) renderCell(cell, game);
+
+    updateUsedGameList();
+    closeSelectModal();
+}
+
+function closeSelectModal() {
+    selectModal.classList.add('hidden');
+    targetCellIndex = null;
+}
+
+
 // --- Core Bingo Functions ---
 
 function clearBoard() {
@@ -360,7 +422,8 @@ function renderBoard() {
         if (game) {
             renderCell(cell, game);
         } else {
-            cell.innerHTML = '<span style="opacity:0.3">+</span>';
+            // Updated empty state for Manual Mode to suggest clicking
+            cell.innerHTML = '<span style="opacity:0.3; font-size: 2rem;">+</span>';
         }
 
         cell.addEventListener('click', () => handleCellClick(i, cell));
@@ -384,6 +447,12 @@ function renderCell(cellElement, game) {
 
 // Handle cell click (toggle mark)
 function handleCellClick(index, cellElement) {
+    // Manual Mode Logic: If empty, click to fill
+    if (isManualMode && !currentBingoGames[index]) {
+        openSelectionModal(index);
+        return;
+    }
+
     // Only allow marking if cell has a game
     if (!currentBingoGames[index]) return;
 
