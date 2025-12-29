@@ -1,0 +1,488 @@
+:root {
+    --bg-color: #0f172a;
+    --text-color: #e2e8f0;
+    --accent-color: #38bdf8;
+    --card-bg: rgba(30, 41, 59, 0.7);
+    --card-border: rgba(148, 163, 184, 0.1);
+
+    --killer-color: #ef4444;
+    /* Red */
+    --achiever-color: #f59e0b;
+    /* Amber/Gold */
+    --socializer-color: #ec4899;
+    /* Pink */
+    --explorer-color: #3b82f6;
+    /* Blue */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+/* Background Effects */
+.background-globes {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.globe {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.4;
+}
+
+.globe-1 {
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, #3b82f6 0%, transparent 70%);
+    top: -200px;
+    right: -200px;
+    animation: float 15s infinite ease-in-out;
+}
+
+.globe-2 {
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, #ec4899 0%, transparent 70%);
+    bottom: -100px;
+    left: -100px;
+    animation: float 20s infinite ease-in-out reverse;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+
+    50% {
+        transform: translate(30px, 30px);
+    }
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+h1 {
+    font-size: 3rem;
+    font-weight: 900;
+    margin-bottom: 10px;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: #94a3b8;
+    margin-bottom: 20px;
+}
+
+.instruction {
+    font-size: 0.9rem;
+    color: var(--accent-color);
+    background: rgba(56, 189, 248, 0.1);
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px;
+}
+
+/* Main Content Layout */
+.content-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    align-items: flex-start;
+}
+
+.graph-section {
+    flex: 1;
+    min-width: 350px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.canvas-container {
+    padding: 1rem;
+    width: 632px;
+    height: 642px;
+    position: relative;
+    background: rgba(15, 23, 42, 0.5);
+    border-radius: 24px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--card-border);
+    margin-bottom: 20px;
+}
+
+canvas {
+    width: 100%;
+    height: 100%;
+    cursor: crosshair;
+}
+
+/* Axis Labels */
+.axis-label {
+    position: absolute;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+}
+
+.axis-label.top {
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.axis-label.bottom {
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.axis-label.left {
+    top: 50%;
+    left: 20px;
+    transform: translateY(-50%);
+}
+
+.axis-label.right {
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+}
+
+.quad-label {
+    position: absolute;
+    font-size: 2rem;
+    font-weight: 900;
+    opacity: 0.05;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.quad-label.tl {
+    top: 25%;
+    left: 25%;
+    transform: translate(-50%, -50%);
+}
+
+.quad-label.tr {
+    top: 25%;
+    right: 25%;
+    transform: translate(50%, -50%);
+}
+
+.quad-label.bl {
+    bottom: 25%;
+    left: 25%;
+    transform: translate(-50%, 50%);
+}
+
+.quad-label.br {
+    bottom: 25%;
+    right: 25%;
+    transform: translate(50%, 50%);
+}
+
+/* Result Box */
+.result-box {
+    width: 100%;
+    max-width: 500px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.result-content h3 {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+    color: #fff;
+}
+
+.result-content p {
+    color: #94a3b8;
+    font-size: 0.95rem;
+}
+
+/* Result Box Improvements */
+.save-btn {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #38bdf8 0%, #3b82f6 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.save-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    filter: brightness(1.1);
+}
+
+.save-btn:active {
+    transform: translateY(0);
+}
+
+.save-btn.hidden {
+    display: none;
+}
+
+/* Axis Definitions */
+.axis-definitions {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    width: 100%;
+    max-width: 632px;
+}
+
+.def-item {
+    background: rgba(15, 23, 42, 0.3);
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.def-item h4 {
+    font-size: 0.85rem;
+    color: #e2e8f0;
+    margin-bottom: 4px;
+}
+
+.def-item p {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    line-height: 1.4;
+}
+
+/* Info Grid (Right Side) */
+.info-section {
+    flex: 1;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    flex: 1;
+    width: 100%;
+    /* Ensure it takes full width in flex container */
+}
+
+/* ... existing info-card styles ... */
+
+.info-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    padding: 24px;
+    border-radius: 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.info-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--card-border);
+    transition: background 0.3s;
+}
+
+.info-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.info-card.mobile-highlight {
+    transform: scale(1.02);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.card-icon {
+    font-size: 2rem;
+    margin-bottom: 12px;
+}
+
+.info-card h2 {
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.tag {
+    display: inline-block;
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    margin-bottom: 12px;
+    color: #cbd5e1;
+    font-weight: 500;
+}
+
+.info-card p {
+    font-size: 0.9rem;
+    color: #94a3b8;
+    line-height: 1.5;
+}
+
+/* Specific Card Colors */
+.info-card.killer::before {
+    background: var(--killer-color);
+}
+
+.info-card.killer .card-icon {
+    color: var(--killer-color);
+}
+
+.info-card.achiever::before {
+    background: var(--achiever-color);
+}
+
+.info-card.achiever .card-icon {
+    color: var(--achiever-color);
+}
+
+.info-card.socializer::before {
+    background: var(--socializer-color);
+}
+
+.info-card.socializer .card-icon {
+    color: var(--socializer-color);
+}
+
+.info-card.explorer::before {
+    background: var(--explorer-color);
+}
+
+.info-card.explorer .card-icon {
+    color: var(--explorer-color);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .container {
+        padding: 20px 15px;
+    }
+
+    header {
+        margin-bottom: 30px;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    .content-wrapper {
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+    }
+
+    .graph-section {
+        width: 100%;
+        min-width: 0;
+        /* Reset min-width */
+    }
+
+    .canvas-container {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        aspect-ratio: 1/1;
+        /* Keep it square */
+        margin-bottom: 20px;
+        padding: 0;
+        /* Remove padding to maximize space on small screens */
+    }
+
+    /* Adjust axis labels for mobile */
+    .axis-label {
+        font-size: 0.7rem;
+    }
+
+    .axis-label.top {
+        top: 10px;
+    }
+
+    .axis-label.bottom {
+        bottom: 10px;
+    }
+
+    .axis-label.left {
+        left: 10px;
+        transform: translateY(-50%) rotate(-90deg);
+    }
+
+    .axis-label.right {
+        right: 10px;
+        transform: translateY(-50%) rotate(90deg);
+    }
+
+    .quad-label {
+        font-size: 1.2rem;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+        /* Single column on mobile */
+    }
+
+    .axis-definitions {
+        grid-template-columns: 1fr;
+        /* Stack vertically on very small screens */
+    }
+}
