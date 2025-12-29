@@ -223,8 +223,10 @@ function saveImage() {
     const tempCtx = tempCanvas.getContext('2d');
 
     // Size matches the current high-res canvas (logical * dpr is actual width in pixels)
+    // Add extra height for description
+    const extraHeight = 200;
     tempCanvas.width = canvas.width;
-    tempCanvas.height = canvas.height;
+    tempCanvas.height = canvas.height + extraHeight;
 
     // Fill Background
     tempCtx.fillStyle = '#0f172a'; // Dark blue background
@@ -243,7 +245,7 @@ function saveImage() {
     tempCtx.textAlign = 'center';
 
     const w = tempCanvas.width;
-    const h = tempCanvas.height;
+    const h = canvas.height; // Use original height for chart centering
 
     // Axis Labels
     tempCtx.fillText('ACTING (행동)', w / 2, 60 * scale + 40);
@@ -266,21 +268,41 @@ function saveImage() {
         // Find current type
         const cx = canvas.logicalWidth / 2;
         const cy = canvas.logicalHeight / 2;
-        let typeName = '';
+        let typeKey = '';
 
         if (currentPos.y < cy) {
-            typeName = (currentPos.x < cx) ? 'KILLER' : 'ACHIEVER';
+            typeKey = (currentPos.x < cx) ? 'killer' : 'achiever';
         } else {
-            typeName = (currentPos.x < cx) ? 'SOCIALIZER' : 'EXPLORER';
+            typeKey = (currentPos.x < cx) ? 'socializer' : 'explorer';
         }
 
+        const typeName = types[typeKey].name;
+        const typeDesc = types[typeKey].desc;
+
+        // Draw Type Name
         const bigFontSize = Math.max(60, 100 * scale);
         tempCtx.font = `900 ${bigFontSize}px "Noto Sans KR", sans-serif`;
         tempCtx.fillStyle = '#ffffff';
         tempCtx.textAlign = 'center';
         tempCtx.shadowColor = 'rgba(0,0,0,0.5)';
         tempCtx.shadowBlur = 20;
-        tempCtx.fillText(typeName, w / 2, h - (bigFontSize + 50));
+
+        // Position Type Name slighly higher to make room
+        tempCtx.fillText(typeName, w / 2, h + 50);
+
+        // Draw Description
+        const descFontSize = Math.max(30, 40 * scale);
+        tempCtx.font = `500 ${descFontSize}px "Noto Sans KR", sans-serif`;
+        tempCtx.fillStyle = '#cbd5e1';
+        tempCtx.shadowBlur = 0;
+
+        // Simple word wrap or just draw it
+        tempCtx.fillText(typeDesc, w / 2, h + 50 + descFontSize * 1.5);
+
+        // Add footer text
+        tempCtx.font = `300 ${descFontSize * 0.6}px "Noto Sans KR", sans-serif`;
+        tempCtx.fillStyle = '#64748b';
+        tempCtx.fillText('바틀의 게이머 유형 테스트', w / 2, tempCanvas.height - 20);
     }
 
     // Trigger Download
