@@ -274,7 +274,7 @@ canvas {
 
 /* Axis Definitions */
 .axis-definitions {
-    margin-top: 20px;
+    margin-bottom: 20px;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 15px;

@@ -37,10 +37,34 @@ const colors = {
 };
 
 const types = {
-    killer: { name: '킬러 (Killers)', desc: '경쟁과 승리를 즐기며, 다른 플레이어에게 영향을 주는 것을 선호합니다.' },
-    achiever: { name: '성취가 (Achievers)', desc: '목표 달성과 성장을 즐기며, 게임 세계 내에서의 성공을 선호합니다.' },
-    socializer: { name: '사교가 (Socializers)', desc: '관계와 소통을 즐기며, 다른 플레이어와의 상호작용을 선호합니다.' },
-    explorer: { name: '탐험가 (Explorers)', desc: '발견과 이해를 즐기며, 게임 세계 자체와의 상호작용을 선호합니다.' }
+    killer: {
+        name: '킬러 (Killers)',
+        desc: '경쟁과 승리를 즐기며, 다른 플레이어에게 영향을 주는 것을 선호합니다.',
+        longDesc: '다른 사람에게 영향력을 행사하는 것을 즐깁니다. 경쟁, 전투, 그리고 승리가 이들의 주된 동기입니다.',
+        tags: 'Players + Acting',
+        symbol: '♣'
+    },
+    achiever: {
+        name: '성취가 (Achievers)',
+        desc: '목표 달성과 성장을 즐기며, 게임 세계 내에서의 성공을 선호합니다.',
+        longDesc: '게임 시스템 내에서의 성공을 추구합니다. 포인트 획득, 레벨 업, 장비 수집 등 목표 달성을 중시합니다.',
+        tags: 'World + Acting',
+        symbol: '♦'
+    },
+    socializer: {
+        name: '사교가 (Socializers)',
+        desc: '관계와 소통을 즐기며, 다른 플레이어와의 상호작용을 선호합니다.',
+        longDesc: '게임은 사람들과 어울리기 위한 수단입니다. 대화, 협동, 커뮤니티 활동에서 가장 큰 즐거움을 찾습니다.',
+        tags: 'Players + Interacting',
+        symbol: '♥'
+    },
+    explorer: {
+        name: '탐험가 (Explorers)',
+        desc: '발견과 이해를 즐기며, 게임 세계 자체와의 상호작용을 선호합니다.',
+        longDesc: '게임 세계의 비밀을 파헤치는 것을 좋아합니다. 맵 탐험, 이스터 에그 발견, 세계관 이해에 몰입합니다.',
+        tags: 'World + Interacting',
+        symbol: '♠'
+    }
 };
 
 function drawChart() {
@@ -52,6 +76,29 @@ function drawChart() {
     const centerY = h / 2;
 
     ctx.clearRect(0, 0, w, h);
+
+    // Draw Background Symbol if currentPos exists
+    if (currentPos) {
+        // Determine type for symbol
+        let typeKey = '';
+        if (currentPos.y < centerY) {
+            typeKey = (currentPos.x < centerX) ? 'killer' : 'achiever';
+        } else {
+            typeKey = (currentPos.x < centerX) ? 'socializer' : 'explorer';
+        }
+
+        const symbol = types[typeKey].symbol;
+        const color = types[typeKey].color || colors[typeKey]; // Fallback to global colors if needed
+
+        ctx.save();
+        ctx.font = 'bold 400px sans-serif'; // Large font
+        ctx.fillStyle = color;
+        ctx.globalAlpha = 0.1; // Low opacity
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(symbol, centerX, centerY);
+        ctx.restore();
+    }
 
     // Draw Grid (Subtle)
     ctx.strokeStyle = colors.grid;
@@ -146,11 +193,6 @@ canvas.addEventListener('click', (e) => {
     const centerY = h / 2;
 
     // Determine Quadrant / Type
-    // Top-Left: Killer (x < center, y < center)
-    // Top-Right: Achiever (x > center, y < center)
-    // Bottom-Left: Socializer (x < center, y > center)
-    // Bottom-Right: Explorer (x > center, y > center)
-
     let type = '';
     let color = '';
 
@@ -217,53 +259,87 @@ if (saveBtn) {
     saveBtn.addEventListener('click', saveImage);
 }
 
+function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+    const words = text.split(''); // Korean character split might be better by simple length or extensive logic, but spaces for words
+    // For Korean/Mixed text simpler approach:
+    let line = '';
+    let testLine = '';
+    let lineCount = 0;
+
+    // improved for mixed content: split by spaces but handle CJK char by char if needed. 
+    // Simple word-break-all style:
+    for (let i = 0; i < text.length; i++) {
+        testLine = line + text[i];
+        const metrics = ctx.measureText(testLine);
+        const testWidth = metrics.width;
+        if (testWidth > maxWidth && i > 0) {
+            ctx.fillText(line, x, y);
+            line = text[i];
+            y += lineHeight;
+            lineCount++;
+        } else {
+            line = testLine;
+        }
+    }
+    ctx.fillText(line, x, y);
+}
+
 function saveImage() {
-    // Create a temporary canvas to composite elements (cleaner export)
+    // Create a temporary canvas
     const tempCanvas = document.createElement('canvas');
     const tempCtx = tempCanvas.getContext('2d');
 
-    // Size matches the current high-res canvas (logical * dpr is actual width in pixels)
-    // Add extra height for description
-    const extraHeight = 200;
+    // Size: Keep width, extend height significantly for clear separation
+    const extraHeight = 450;
     tempCanvas.width = canvas.width;
     tempCanvas.height = canvas.height + extraHeight;
+    const w = tempCanvas.width;
+    const h = tempCanvas.height;
+    const chartH = canvas.height;
 
-    // Fill Background
+    // Fill Background (Main)
     tempCtx.fillStyle = '#0f172a'; // Dark blue background
-    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+    tempCtx.fillRect(0, 0, w, h);
 
     // Draw the main chart
     tempCtx.drawImage(canvas, 0, 0);
 
-    // Add Labels manually
-    // Scale font size based on canvas width to ensure readability on high-res
-    const scale = tempCanvas.width / 1500; // base scale
-    const fontSize = Math.max(24, 40 * scale);
+    // Draw Divider Area Background (Card style)
+    tempCtx.fillStyle = 'rgba(30, 41, 59, 1)';
+    tempCtx.fillRect(0, chartH, w, extraHeight);
 
+    // Separator Line
+    tempCtx.strokeStyle = 'rgba(148, 163, 184, 0.2)';
+    tempCtx.lineWidth = 2;
+    tempCtx.beginPath();
+    tempCtx.moveTo(40, chartH);
+    tempCtx.lineTo(w - 40, chartH);
+    tempCtx.stroke();
+
+    const scale = tempCanvas.width / 1500;
+
+    // Add Axis Labels (Top section) - Same as before
+    const fontSize = Math.max(24, 40 * scale);
     tempCtx.font = `bold ${fontSize}px "Noto Sans KR", sans-serif`;
     tempCtx.fillStyle = 'rgba(255,255,255,0.7)';
     tempCtx.textAlign = 'center';
 
-    const w = tempCanvas.width;
-    const h = canvas.height; // Use original height for chart centering
-
-    // Axis Labels
     tempCtx.fillText('ACTING (행동)', w / 2, 60 * scale + 40);
-    tempCtx.fillText('INTERACTING (상호작용)', w / 2, h - (40 * scale + 20));
+    tempCtx.fillText('INTERACTING (상호작용)', w / 2, chartH - (40 * scale + 20));
 
     tempCtx.save();
-    tempCtx.translate(60 * scale + 20, h / 2);
+    tempCtx.translate(60 * scale + 20, chartH / 2);
     tempCtx.rotate(-Math.PI / 2);
     tempCtx.fillText('PLAYERS (플레이어)', 0, 0);
     tempCtx.restore();
 
     tempCtx.save();
-    tempCtx.translate(w - (60 * scale + 20), h / 2);
+    tempCtx.translate(w - (60 * scale + 20), chartH / 2);
     tempCtx.rotate(Math.PI / 2);
     tempCtx.fillText('WORLD (세계)', 0, 0);
     tempCtx.restore();
 
-    // If result exists, draw it bigger
+    // If result exists
     if (currentPos) {
         // Find current type
         const cx = canvas.logicalWidth / 2;
@@ -276,33 +352,58 @@ function saveImage() {
             typeKey = (currentPos.x < cx) ? 'socializer' : 'explorer';
         }
 
-        const typeName = types[typeKey].name;
-        const typeDesc = types[typeKey].desc;
+        const data = types[typeKey];
+        const typeName = data.name;
+        const typeTags = data.tags;
+        const typeSymbol = data.symbol;
+        const typeLongDesc = data.longDesc;
+        const mainColor = colors[typeKey];
 
-        // Draw Type Name
-        const bigFontSize = Math.max(60, 100 * scale);
+        // Bottom Section Content
+        const bottomCenterY = chartH + (extraHeight / 2);
+
+        // 1. Symbol Icon (Left side or Top center of bottom section?)
+        // Let's put it top center of bottom section
+        tempCtx.font = `${100 * scale}px sans-serif`;
+        tempCtx.fillStyle = mainColor;
+        tempCtx.textAlign = 'center';
+        tempCtx.fillText(typeSymbol, w / 2, chartH + 100 * scale);
+
+        // 2. Type Name
+        const bigFontSize = Math.max(50, 80 * scale);
         tempCtx.font = `900 ${bigFontSize}px "Noto Sans KR", sans-serif`;
         tempCtx.fillStyle = '#ffffff';
-        tempCtx.textAlign = 'center';
         tempCtx.shadowColor = 'rgba(0,0,0,0.5)';
         tempCtx.shadowBlur = 20;
-
-        // Position Type Name slighly higher to make room
-        tempCtx.fillText(typeName, w / 2, h + 50);
-
-        // Draw Description
-        const descFontSize = Math.max(30, 40 * scale);
-        tempCtx.font = `500 ${descFontSize}px "Noto Sans KR", sans-serif`;
-        tempCtx.fillStyle = '#cbd5e1';
+        tempCtx.fillText(typeName, w / 2, chartH + 100 * scale + bigFontSize + 20);
         tempCtx.shadowBlur = 0;
 
-        // Simple word wrap or just draw it
-        tempCtx.fillText(typeDesc, w / 2, h + 50 + descFontSize * 1.5);
+        // 3. Tags
+        const tagFontSize = Math.max(20, 30 * scale);
+        tempCtx.font = `500 ${tagFontSize}px "Noto Sans KR", sans-serif`;
+        tempCtx.fillStyle = '#94a3b8';
+        tempCtx.fillText(typeTags, w / 2, chartH + 100 * scale + bigFontSize + tagFontSize + 40);
 
-        // Add footer text
+        // 4. Long Description
+        const descFontSize = Math.max(26, 36 * scale);
+        tempCtx.font = `400 ${descFontSize}px "Noto Sans KR", sans-serif`;
+        tempCtx.fillStyle = '#e2e8f0';
+        const lineHeight = descFontSize * 1.6;
+        const maxWidth = w * 0.8; // 80% width
+
+        wrapText(tempCtx, typeLongDesc, w / 2, chartH + 100 * scale + bigFontSize + tagFontSize + 120, maxWidth, lineHeight);
+
+        // Footer
         tempCtx.font = `300 ${descFontSize * 0.6}px "Noto Sans KR", sans-serif`;
         tempCtx.fillStyle = '#64748b';
-        tempCtx.fillText('바틀의 게이머 유형 테스트', w / 2, tempCanvas.height - 20);
+        tempCtx.fillText('바틀의 게이머 유형 테스트', w / 2, h - 30);
+    } else {
+        // No result selected state
+        const descFontSize = Math.max(24, 30 * scale);
+        tempCtx.font = `400 ${descFontSize}px "Noto Sans KR", sans-serif`;
+        tempCtx.fillStyle = '#94a3b8';
+        tempCtx.textAlign = 'center';
+        tempCtx.fillText('결과가 선택되지 않았습니다.', w / 2, chartH + extraHeight / 2);
     }
 
     // Trigger Download
